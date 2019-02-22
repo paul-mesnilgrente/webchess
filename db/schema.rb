@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_22_015845) do
+ActiveRecord::Schema.define(version: 2019_02_22_031958) do
+
+  create_table "challenges", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "challenger_id"
+    t.integer "challenged_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenged_id"], name: "index_challenges_on_challenged_id"
+    t.index ["challenger_id"], name: "index_challenges_on_challenger_id"
+  end
 
   create_table "games", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "white_player_id"
