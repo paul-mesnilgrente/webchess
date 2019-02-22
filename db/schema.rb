@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_22_011249) do
+ActiveRecord::Schema.define(version: 2019_02_22_015845) do
+
+  create_table "games", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "white_player_id"
+    t.integer "black_player_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "moves", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.bigint "game_id"
+    t.integer "number"
+    t.string "notation", limit: 8
+    t.datetime "created_at"
+    t.index ["game_id"], name: "index_moves_on_game_id"
+  end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "username", limit: 40
