@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :users
+  resources :challenges
   get 'challenge/index'
   get 'challenge/show'
   get 'challenge/edit'
