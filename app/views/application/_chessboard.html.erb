@@ -1,0 +1,14 @@
+<div class="default-theme" id="chessboard">
+  <% ('a'..'h').each do |rank| %>
+    <div class="rank">
+    <% (1..8).each do |file| %>
+      <% square_color = 'black' %>
+      <% if (rank.ord % 2 == 1 && file % 2 == 0) || (rank.ord % 2 == 0 && file % 2 == 1) %>
+        <% square_color = 'white' %>
+      <% end %>
+      <square class="<%= square_color %>" id="<%= rank + file.to_s %>">
+      </square>
+    <% end %>
+    </div>
+  <% end %>
+</div>
