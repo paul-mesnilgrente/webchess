@@ -7,14 +7,14 @@ class DefaultController < ApplicationController
 
   def sandbox
       @board = {
-        1 => ['wr', 'wn', 'wb', 'wq', 'wk', 'wb', 'wn', 'wr'],
-        2 => ['wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp', 'wp'],
-        3 => [nil, nil, nil, nil, nil, nil, nil, nil],
-        4 => [nil, nil, nil, nil, nil, nil, nil, nil],
-        5 => [nil, nil, nil, nil, nil, nil, nil, nil],
-        6 => [nil, nil, nil, nil, nil, nil, nil, nil],
-        7 => ['bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp', 'bp'],
-        8 => ['br', 'bn', 'bb', 'bq', 'bk', 'bb', 'bn', 'br'],
+        'a' => ['wr', 'wp', nil, nil, nil, nil, 'bp', 'br'],
+        'b' => ['wn', 'wp', nil, nil, nil, nil, 'bp', 'bn'],
+        'c' => ['wb', 'wp', nil, nil, nil, nil, 'bp', 'bb'],
+        'd' => ['wq', 'wp', nil, nil, nil, nil, 'bp', 'bq'],
+        'e' => ['wk', 'wp', nil, nil, nil, nil, 'bp', 'bk'],
+        'f' => ['wb', 'wp', nil, nil, nil, nil, 'bp', 'bb'],
+        'g' => ['wn', 'wp', nil, nil, nil, nil, 'bp', 'bn'],
+        'h' => ['wr', 'wp', nil, nil, nil, nil, 'bp', 'br'],
       }
   end
 end
