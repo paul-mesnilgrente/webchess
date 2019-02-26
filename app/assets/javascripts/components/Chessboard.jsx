@@ -56,7 +56,10 @@ class Chessboard extends React.Component {
 
 		if (this.state.selectedPiece == "" && pieceOnSquare != null) {
 			this.setState({selectedPiece: square})
-		} else {
+		} else if (file1 == file && rank1 == rank) {
+			return;
+		}
+		else {
 			this.movePiece(file1, rank1, file, rank)
 		}
 	}
