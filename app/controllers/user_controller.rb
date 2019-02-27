@@ -1,4 +1,7 @@
 class UserController < ApplicationController
+
+  before_action :confirm_logged_in, :except => [:login, :attempt_login, :logout]
+
   def new
   end
 
@@ -21,5 +24,44 @@ class UserController < ApplicationController
   end
 
   def destroy
+  end
+
+  def search
+    respond_to do |format|
+      if params[:username].present?
+        users = User.search(params[:username]).where("id != ?", @user.id)
+        format.json { render({:json => users})}
+      else
+        format.json { render({:json => 'username should be included'})}
+      end
+    end
+  end
+
+
+  def login
+  end
+
+  def attempt_login
+    if params[:email].present? && params[:password].present?
+      found_user = User.where(:email => params[:email]).first
+      if found_user
+        authorized_user = found_user.authenticate(params[:password])
+      end
+    end
+
+    if authorized_user
+      session[:user_id] = authorized_user.id
+      flash[:notice] = "You are now logged in."
+      redirect_to(challenge_index_path)
+    else
+      flash.now[:notice] = "Invalid email/password combination."
+      render('login')
+    end
+  end
+
+  def logout
+    session[:user_id] = nil
+    flash[:notice] = 'Logged out'
+    redirect_to(user_login_path)
   end
 end

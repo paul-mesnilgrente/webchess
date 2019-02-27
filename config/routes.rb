@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root 'default#index'
+  root 'public#index', :as => 'homepage'
 
   resources :users do
     member do
@@ -7,22 +7,27 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :challenges do
+  resources :challenge do
     member do
       get :delete
     end
   end
 
-  get 'user/login', as: 'login'
+  get 'challenge/:id/accept', :to => 'challenge#accept', :as => 'accept_challenge'
 
-  get 'challenge/index'
-  get 'challenge/show'
-  get 'challenge/edit'
-  get 'challenge/delete'
-  root 'default#index'
+  get 'game/:id/play', :to => 'game#play', :as => 'play_game'
+  get 'game/', :to => 'game#index', :as => 'game_index'
+
+  get  'user/search'
+  get  'user/login'
+  post 'user/attempt_login'
+  get  'user/logout'
   
-  get 'default/index', as: 'homepage'
-  get 'default/contact'
-  get 'default/sandbox'
+  get '/contact', :to => 'public#contact'
+  get '/sandbox', :to => 'public#sandbox'
+
+  mount ActionCable.server => '/cable'
+
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

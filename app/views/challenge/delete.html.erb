@@ -1,2 +1,35 @@
-<h1>Challenge#delete</h1>
-<p>Find me in app/views/challenge/delete.html.erb</p>
+<% if @user == @challenge.challenger %>
+  <% @page_title = "Cancel challenge" %>
+<% else %>
+  <% @page_title = "Reject challenge" %>
+<% end %>
+
+
+<%= link_to("<< Back to challenges", challenge_index_path, :class => 'btn btn-primary') %>
+
+<div class="subjects delete">
+  <h2>Reject challenge</h2>
+
+  <%= form_for(@challenge, :method => 'delete') do |f| %>
+
+    <% if @user == @challenge.challenger %>
+      <p>
+        Are you sure you want to cancel the challenge sent to <%= @challenge.challenged.username %>?
+      </p>
+    <% else %>
+    <p>
+        Are you sure you want to reject the challenge sent from <%= @challenge.challenger.username %>?
+      </p>
+    <% end %>
+
+    <div class="form-buttons">
+    <% if @user == @challenge.challenger %>
+      <%= f.submit("Cancel challenge", {:class => "btn btn-danger"}) %>
+    <% else %>
+      <%= f.submit("Reject challenge", {:class => "btn btn-danger"}) %>
+    <% end %>
+    </div>
+
+  <% end %>
+</div>
+

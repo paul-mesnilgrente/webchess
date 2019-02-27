@@ -1,0 +1,19 @@
+<% @page_title = "Play game" %>
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <%= react_component("Chessboard", {'board': @board}) %>
+    </div>
+    <div class="col">
+      <p>
+        Opponent: 
+        <% if @user == @game.black_player %>
+          <%= @game.white_player.username %>
+        <% else %>
+          <%= @game.black_player.username %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>
