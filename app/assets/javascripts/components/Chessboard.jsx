@@ -1,26 +1,25 @@
 class Chessboard extends React.Component {
 	constructor(props) {
 		super(props)
+
 		channel = App.cable.subscriptions.create({
 			channel: "ChessGameChannel",
 			room: "game-" + this.props.id}, {
 				'connected': data => {
-					console.log('Connected to game-' + this.props.id)
+					console.log(`Connected to "game-${this.props.id}"`)
 				},
 				'disconnected': data => {
-					console.log('Disconnected from game-' + this.props.id)
+					console.log(`Disconnected from "game-${this.props.id}"`)
 				},
 				'received': data => {
-					file1 = data.message[0]
-					rank1 = data.message[1]
-					file2 = data.message[2]
-					rank2 = data.message[3]
-					if (this.moveValid(file1, rank1, file2, rank2)) {
-						board = this.state.board
-						board[file2][rank2-1] = board[file1][rank1-1]
-						board[file1][rank1-1] = null
-						this.setState({board: board, selectedPiece: ""})
-					} else {
+					var square_start = new Position(data.message[0], parseInt(data.message[1]))
+					var square_end = new Position(data.message[2], parseInt(data.message[3]))
+					if (this.state.game.moveValid(square_start, square_end)) {
+						this.state.game.board.move(square_start, square_end)
+						this.setState({
+							controlled: [],
+							selectedPiece: null
+						})
 					}
 				},
 				'speak': function(message) {
@@ -28,10 +27,14 @@ class Chessboard extends React.Component {
 				}
 			}
 		)
+
+
 		channel.chessboard = this
 		this.state = {
-			board: this.props.board,
-			selectedPiece: "",
+			game: new ChessGame(this.props.moves),
+			selectedPiece: null,
+			controlled: [],
+			refresh: true,
 			channel: channel
 		}
 		
@@ -39,69 +42,72 @@ class Chessboard extends React.Component {
 		this.renderSquare = this.renderSquare.bind(this)
 		this.renderRank = this.renderRank.bind(this)
 		this.onSquareClick = this.onSquareClick.bind(this)
-		this.receive = this.receive.bind(this)
 	}
 
-	send(file1, rank1, file2, rank2) {
-		this.state.channel.speak(`${file1}${rank1}${file2}${rank2}`)
-	}
-
-	moveValid(file1, rank1, file2, rank2) {
-		piece1 = this.state.board[file1][rank1 - 1]
-		piece2 = this.state.board[file2][rank2 - 1]
-		if (piece1 == null) {
-			throw new Error("No piece in " + file1 + rank1)
+	send(square_start, square_end) {
+		if (this.state.game.moveValid(square_start, square_end)) {
+			this.state.channel.speak(`${square_start.toString()}${square_end.toString()}`)
+		} else {
+			this.setState({
+				controlled: [],
+				selectedPiece: null
+			})
 		}
-		if (piece2 != null) {
-			if (this.pieceColor(file1 + rank1) == this.pieceColor(file2 + rank2)) {
-				return false
-			}
+	}
+
+	toggleSelectPiece(piece) {
+
+		if (this.state.selectedPiece == null) {
+			piece = this.state.game.board.at(piece.position)
+			this.setState({
+				selectedPiece: piece,
+				controlled: piece.available_moves(this.state.game.board)
+			})
+		} else {
+			this.setState({
+				selectedPiece: null,
+				controlled: []
+			})
 		}
-
-		return true
 	}
 
-	pieceColor(square) {
-		piece = this.state.board[square[0]][square[1] - 1]
-		return piece[0] == "w" ? "white" : "black"
-	}
+	onSquareClick(square_clicked) {
+		pieceOnSquare = this.state.game.board.at(square_clicked)
 
-	onSquareClick(file, rank) {
-		square = file + rank
-		file1 = this.state.selectedPiece[0]
-		rank1 = this.state.selectedPiece[1]
-		pieceOnSquare = this.state.board[file][rank-1]
-
-		if (this.state.selectedPiece == "" && pieceOnSquare != null) {
-			if (pieceOnSquare[0] == this.props.player) {
-				this.setState({selectedPiece: square})
+		// select a piece
+		if (this.state.selectedPiece == null && pieceOnSquare != null) {
+			if (pieceOnSquare.color == this.props.player) {
+				this.toggleSelectPiece(pieceOnSquare)
 			}
-		} else if (file1 == file && rank1 == rank) {
-			this.setState({selectedPiece: ""})
+		// unselect the piece
+		} else if (square_clicked.equals(this.state.selectedPiece.position)) {
+			this.toggleSelectPiece(pieceOnSquare)
 		}
 		else {
-			this.send(file1, rank1, file, rank)
+			this.send(this.state.selectedPiece.position, square_clicked)
 		}
 	}
 
 	renderSquare(file, rank) {
-		let color = "black"
-		file_i = file.charCodeAt(0) - 97
-		if ((rank + file_i) % 2 == 0) {
-			color = 'white';
+		var position = new Position(file, rank)
+		controlled = false
+		for (var i = 0; i < this.state.controlled.length && !controlled; i++) {
+			move = this.state.controlled[i]
+			if (move.square.equals(position))
+				controlled = true
 		}
-		selected = this.state.selectedPiece == file + rank ? true : false
-			key = file + rank
+		var selected = false
+		if (this.state.selectedPiece != null && this.state.selectedPiece.position.equals(position)) {
+			selected = true
+		}
 		return (
 			<Square
-				key={key}
-				file={file}
-				rank={rank}
-				color={color}
+				key={file + rank}
+				position={position}
 				selected={selected}
-				onPieceClick={this.onPieceClick}
+				controlled={controlled}
 				onSquareClick={this.onSquareClick}
-				piece={this.state.board[file][rank-1]}
+				piece={this.state.game.board.at(position)}
 			/>
 		)
 	}

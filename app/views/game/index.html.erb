@@ -17,7 +17,7 @@
           <tr>
             <th scope="row"><%= index + 1%></th>
             <td>
-              <% if game.black_player == @user %>
+              <% if game.black_player == @current_user %>
                 <%= game.white_player.username %>
               <% else %>
                 <%= game.black_player.username %>

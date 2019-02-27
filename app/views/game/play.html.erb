@@ -5,8 +5,8 @@
     <div class="col">
       <%= react_component("Chessboard", {
         'id': @game.id,
-        'board': @board,
-        'player': @player
+        'player': @player,
+        'moves': @game.moves
       }) %>
     </div>
     <div class="col">
