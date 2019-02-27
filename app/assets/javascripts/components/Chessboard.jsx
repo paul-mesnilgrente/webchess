@@ -1,17 +1,59 @@
 class Chessboard extends React.Component {
 	constructor(props) {
 		super(props)
+		channel = App.cable.subscriptions.create({
+			channel: "ChessGameChannel",
+			room: "game-" + this.props.id}, {
+				'connected': (data) => {
+					console.log('Connected to game-' + this.props.id)
+				},
+				'disconnected': (data) => {
+					console.log('Disconnected from game-' + this.props.id)
+				},
+				'received': data => {
+					console.log('RECEIVED:', this)
+
+					file1 = data.message[0]
+					rank1 = data.message[1]
+					file2 = data.message[2]
+					rank2 = data.message[3]
+					console.log('RECEIVED:', `${file1}${rank1}${file2}${rank2}`)
+					if (this.moveValid(file1, rank1, file2, rank2)) {
+						console.log('Valid move')
+						board = this.state.board
+						board[file2][rank2-1] = board[file1][rank1-1]
+						board[file1][rank1-1] = null
+						this.setState({board: board, selectedPiece: ""})
+					} else {
+						console.log('Invalid move')
+					}
+				},
+				'speak': function(message) {
+					return this.perform('speak', {message: message})
+				}
+			}
+		)
+		channel.chessboard = this
 		this.state = {
 			board: this.props.board,
-			selectedPiece: ""
+			selectedPiece: "",
+			channel: channel
 		}
+		
 
 		this.renderSquare = this.renderSquare.bind(this)
 		this.renderRank = this.renderRank.bind(this)
 		this.onSquareClick = this.onSquareClick.bind(this)
-		// this.moveValid = this.moveValid.bind(this)
-		// this.movePiece = this.movePiece.bind(this)
-		// this.pieceColor = this.pieceColor.bind(this)
+		this.receive = this.receive.bind(this)
+	}
+
+	receive(data) {
+		
+	}
+
+	send(file1, rank1, file2, rank2) {
+		console.log('SEND:', `${file1}${rank1}${file2}${rank2}`)
+		this.state.channel.speak(`${file1}${rank1}${file2}${rank2}`)
 	}
 
 	moveValid(file1, rank1, file2, rank2) {
@@ -29,20 +71,6 @@ class Chessboard extends React.Component {
 		return true
 	}
 
-	movePiece(file1, rank1, file2, rank2) {
-		console.log('Move piece:', file1 + rank1, ' -> ', file2 + rank2)
-		if (this.moveValid(file1, rank1, file2, rank2)) {
-			console.log('Valid move')
-			board = this.state.board
-			board[file2][rank2-1] = board[file1][rank1-1]
-			board[file1][rank1-1] = null
-			App.room.speak(`${file1}${rank1}${file2}${rank2}`)
-			this.setState({board: board, selectedPiece: ""})
-		} else {
-			console.log('Invalid move')
-		}
-	}
-
 	pieceColor(square) {
 		piece = this.state.board[square[0]][square[1] - 1]
 		return piece[0] == "w" ? "white" : "black"
@@ -58,10 +86,10 @@ class Chessboard extends React.Component {
 		if (this.state.selectedPiece == "" && pieceOnSquare != null) {
 			this.setState({selectedPiece: square})
 		} else if (file1 == file && rank1 == rank) {
-			return;
+			this.setState({selectedPiece: ""})
 		}
 		else {
-			this.movePiece(file1, rank1, file, rank)
+			this.send(file1, rank1, file, rank)
 		}
 	}
 

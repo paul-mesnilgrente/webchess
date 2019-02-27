@@ -28,10 +28,11 @@ class GameController < ApplicationController
   def move_piece(board, move)
     # norm: <file_start><rank_start></file_end><rank_end>
     file_start = move.notation[0]
-    rank_start = move.notation[1]
+    rank_start = move.notation[1].to_i
     file_end = move.notation[2]
-    rank_end = move.notation[3]
+    rank_end = move.notation[3].to_i
     board[file_end][rank_end-1] = board[file_start][rank_start-1]
+    board[file_start][rank_start-1] = nil
 
     return board
   end
