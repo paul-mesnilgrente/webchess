@@ -1,14 +1,12 @@
 class ChallengeController < ApplicationController
 
-  before_action :confirm_logged_in
-
   def index
-    @challenges_received = Challenge.where("challenged_id = ?", @user.id)
-    @challenges_sent = Challenge.where("challenger_id = ?", @user.id)
+    @challenges_received = Challenge.where("challenged_id = ?", @current_user.id)
+    @challenges_sent = Challenge.where("challenger_id = ?", @current_user.id)
   end
 
   def new
-    challenger = @user
+    challenger = @current_user
     if params[:challenged].present?
       challenged = User.find(params[:challenged])
       challenge = Challenge.new
@@ -36,7 +34,7 @@ class ChallengeController < ApplicationController
   def destroy
     @challenge = Challenge.find(params[:id])
     @challenge.destroy
-    if @challenge.challenger == @user
+    if @challenge.challenger == @current_user
       flash[:notice] = "Challenge with '#{@challenge.challenged.username}' successfully cancelled."
     else
       flash[:notice] = "Challenge with '#{@challenge.challenged.username}' successfully rejected."

@@ -1,9 +1,8 @@
 class GameController < ApplicationController
 
-  before_action :confirm_logged_in
-
   def index
-    games = Game.where(:black_player_id => @user.id).or(:black_player_id => @user.id)
+    id = @current_user.id
+    @games = Game.where(:black_player_id => id).or(Game.where(:white_player_id => id))
   end
 
   def play

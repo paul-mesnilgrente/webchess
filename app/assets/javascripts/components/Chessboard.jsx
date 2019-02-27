@@ -36,6 +36,7 @@ class Chessboard extends React.Component {
 			board = this.state.board
 			board[file2][rank2-1] = board[file1][rank1-1]
 			board[file1][rank1-1] = null
+			App.room.speak(`${file1}${rank1}${file2}${rank2}`)
 			this.setState({board: board, selectedPiece: ""})
 		} else {
 			console.log('Invalid move')

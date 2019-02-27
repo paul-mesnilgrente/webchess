@@ -1,6 +1,6 @@
 class UserController < ApplicationController
 
-  before_action :confirm_logged_in, :except => [:login, :attempt_login, :logout]
+  skip_before_action :ensure_authenticated_user, only: %i( login attempt_login logout )
 
   def new
   end
@@ -50,7 +50,7 @@ class UserController < ApplicationController
     end
 
     if authorized_user
-      session[:user_id] = authorized_user.id
+      authenticate_user(found_user.id)
       flash[:notice] = "You are now logged in."
       redirect_to(challenge_index_path)
     else
@@ -60,7 +60,7 @@ class UserController < ApplicationController
   end
 
   def logout
-    session[:user_id] = nil
+    unauthenticate_user
     flash[:notice] = 'Logged out'
     redirect_to(user_login_path)
   end

@@ -15,17 +15,17 @@ class Square extends React.Component {
 		if (piece) {
 			let pieceColor = piece[0] == "w" ? "white" : "black"
 			if (piece[1] == 'p')
-				return <Pawn imgFile={"/images/pieces/" + pieceColor + "_pawn.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_pawn.svg"} color={pieceColor} selected={selected} />
 			else if (piece[1] == 'r')
-				return <Rook imgFile={"/images/pieces/" + pieceColor + "_rook.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_rook.svg"} color={pieceColor} selected={selected} />
 			else if (piece[1] == 'n')
-				return <Knight imgFile={"/images/pieces/" + pieceColor + "_knight.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_knight.svg"} color={pieceColor} selected={selected} />
 			else if (piece[1] == 'b')
-				return <Bishop imgFile={"/images/pieces/" + pieceColor + "_bishop.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_bishop.svg"} color={pieceColor} selected={selected} />
 			else if (piece[1] == 'q')
-				return <Queen imgFile={"/images/pieces/" + pieceColor + "_queen.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_queen.svg"} color={pieceColor} selected={selected} />
 			else if (piece[1] == 'k')
-				return <King imgFile={"/images/pieces/" + pieceColor + "_king.svg"} color={pieceColor} selected={selected} />
+				return <PieceImg imgFile={"/images/pieces/" + pieceColor + "_king.svg"} color={pieceColor} selected={selected} />
 		}
 		return null
 	}

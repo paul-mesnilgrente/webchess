@@ -46,7 +46,7 @@ class Board {
 	}
 
 	move(p1, p2) {
-		this.board[]
+		this.board[p2] = p1
 	}
 
 	at(position) {
@@ -96,7 +96,7 @@ class Piece {
 class Pawn extends Piece {
 	available_moves(board) {
 		moves = []
-		additionner = this.color "white" ? +1 : -1
+		additionner = this.color == "white" ? +1 : -1
 
 		// move forward of 1
 		p1 = new Position(this.position.file, this.position.rank + additionner)
@@ -161,10 +161,10 @@ class Knight extends Piece {
 			new Position(nextChar(p.file), p.rank + 2),
 			new Position(prevChar(p.file), p.rank - 2),
 			new Position(nextChar(p.file), p.rank - 2),
-			new Position(prevChar(prevChar(p.file), p.rank + 1),
-			new Position(prevChar(prevChar(p.file), p.rank - 1),
-			new Position(nextChar(nextChar(p.file), p.rank + 1),
-			new Position(nextChar(nextChar(p.file), p.rank - 1)
+			new Position(prevChar(prevChar(p.file)), p.rank + 1),
+			new Position(prevChar(prevChar(p.file)), p.rank - 1),
+			new Position(nextChar(nextChar(p.file)), p.rank + 1),
+			new Position(nextChar(nextChar(p.file)), p.rank - 1)
 		]
 
 		positions.forEach(position => {

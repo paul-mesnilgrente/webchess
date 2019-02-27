@@ -9,7 +9,7 @@
       <li class="nav-item">
         <%= link_to("Home", homepage_path, {:class => 'nav-link'}) %>
       </li>
-      <% if @user == nil %>
+      <% if @current_user == nil %>
       <li class="nav-item">
         <%= link_to("Login", user_login_path, {:class => 'nav-link'}) %>
       </li>
@@ -18,13 +18,14 @@
       </li>
       <% else %>
         <%= link_to("Challenges", challenge_index_path, {:class => 'nav-link'}) %>
+        <%= link_to("Games", game_index_path, {:class => 'nav-link'}) %>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <%= @user.username %>
+          <a class="nav-link dropdown-toggle" href="#" id="user-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <%= @current_user.username %>
           </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <div class="dropdown-menu" aria-labelledby="user-dropdown">
             <%= link_to("Logout", user_logout_path, {:class => 'dropdown-item'}) %>
-            <a class="" href="#">Action</a>
+            <a class="dropdown-item" href="#">Action</a>
             <a class="dropdown-item" href="#">Another action</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Something else here</a>

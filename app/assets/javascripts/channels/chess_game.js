@@ -1,5 +1,6 @@
-App.room = App.cable.subscriptions.create(
-	"game_", {
+App.room = App.cable.subscriptions.create({
+	channel: "ChessGame",
+	room: "1"}, {
 		'connected': (data) => {
 			console.log('Connected to game_')
 		},
