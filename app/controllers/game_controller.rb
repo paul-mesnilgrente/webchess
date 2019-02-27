@@ -21,6 +21,7 @@ class GameController < ApplicationController
     @game.moves.each() do |move|
       @board = move_piece(@board, move)
     end
+    @player = @current_user == @game.white_player ? "w" : "b"
   end
 
   private

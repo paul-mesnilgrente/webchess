@@ -4,28 +4,23 @@ class Chessboard extends React.Component {
 		channel = App.cable.subscriptions.create({
 			channel: "ChessGameChannel",
 			room: "game-" + this.props.id}, {
-				'connected': (data) => {
+				'connected': data => {
 					console.log('Connected to game-' + this.props.id)
 				},
-				'disconnected': (data) => {
+				'disconnected': data => {
 					console.log('Disconnected from game-' + this.props.id)
 				},
 				'received': data => {
-					console.log('RECEIVED:', this)
-
 					file1 = data.message[0]
 					rank1 = data.message[1]
 					file2 = data.message[2]
 					rank2 = data.message[3]
-					console.log('RECEIVED:', `${file1}${rank1}${file2}${rank2}`)
 					if (this.moveValid(file1, rank1, file2, rank2)) {
-						console.log('Valid move')
 						board = this.state.board
 						board[file2][rank2-1] = board[file1][rank1-1]
 						board[file1][rank1-1] = null
 						this.setState({board: board, selectedPiece: ""})
 					} else {
-						console.log('Invalid move')
 					}
 				},
 				'speak': function(message) {
@@ -47,12 +42,7 @@ class Chessboard extends React.Component {
 		this.receive = this.receive.bind(this)
 	}
 
-	receive(data) {
-		
-	}
-
 	send(file1, rank1, file2, rank2) {
-		console.log('SEND:', `${file1}${rank1}${file2}${rank2}`)
 		this.state.channel.speak(`${file1}${rank1}${file2}${rank2}`)
 	}
 
@@ -77,14 +67,15 @@ class Chessboard extends React.Component {
 	}
 
 	onSquareClick(file, rank) {
-		console.log('CHESSBOARD onSquareClick: ', file + rank)
 		square = file + rank
 		file1 = this.state.selectedPiece[0]
 		rank1 = this.state.selectedPiece[1]
 		pieceOnSquare = this.state.board[file][rank-1]
 
 		if (this.state.selectedPiece == "" && pieceOnSquare != null) {
-			this.setState({selectedPiece: square})
+			if (pieceOnSquare[0] == this.props.player) {
+				this.setState({selectedPiece: square})
+			}
 		} else if (file1 == file && rank1 == rank) {
 			this.setState({selectedPiece: ""})
 		}

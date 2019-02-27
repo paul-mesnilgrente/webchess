@@ -25,11 +25,9 @@ class SearchUser extends React.Component {
 	handleUsernameChange(e) {
 		this.setState({loading: true})
 		input = e.target.value;
-		console.log('input:', input)
 		fetch('http://localhost:3000/user/search.json?username=' + input)
 		.then(data => data.json())
 		.then(data => {
-			console.log(data)
 			this.setState({data: data, loading: false})
 		})
 	}
