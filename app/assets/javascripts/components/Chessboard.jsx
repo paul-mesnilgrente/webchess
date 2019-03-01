@@ -1,8 +1,22 @@
 class Chessboard extends React.Component {
 	constructor(props) {
 		super(props)
+		console.log('CHESSBOARD CONSTRUCTOR')
 
-		channel = App.cable.subscriptions.create({
+		this.state = {
+			game: new ChessGame(this.props.moves),
+			selectedPiece: null,
+			controlled: [],
+			channel: null
+		}
+
+		this.renderSquare = this.renderSquare.bind(this)
+		this.renderRank = this.renderRank.bind(this)
+		this.onSquareClick = this.onSquareClick.bind(this)
+	}
+
+	componentDidMount() {
+		var channel = App.cable.subscriptions.create({
 			channel: "ChessGameChannel",
 			room: "game-" + this.props.id}, {
 				'connected': data => {
@@ -27,21 +41,7 @@ class Chessboard extends React.Component {
 				}
 			}
 		)
-
-
-		channel.chessboard = this
-		this.state = {
-			game: new ChessGame(this.props.moves),
-			selectedPiece: null,
-			controlled: [],
-			refresh: true,
-			channel: channel
-		}
-		
-
-		this.renderSquare = this.renderSquare.bind(this)
-		this.renderRank = this.renderRank.bind(this)
-		this.onSquareClick = this.onSquareClick.bind(this)
+		this.setState({channel: channel})
 	}
 
 	send(square_start, square_end) {

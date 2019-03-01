@@ -20,31 +20,34 @@ class ChessGame {
 }
 
 class Board {
-	constructor(moves) {
-		this.board = {}
+	constructor() {
+		// main pieces
+		this.board = {
+			// whites
+			'a1': new Rook(  "w",   new Position('a', 1)),
+			'b1': new Knight("w", new Position('b', 1)),
+			'c1': new Bishop("w", new Position('c', 1)),
+			'd1': new Queen( "w",  new Position('d', 1)),
+			'e1': new King(  "w",   new Position('e', 1)),
+			'f1': new Bishop("w", new Position('f', 1)),
+			'g1': new Knight("w", new Position('g', 1)),
+			'h1': new Rook(  "w",   new Position('h', 1)),
+			// blacks
+			'a8': new Rook(  "b", new Position('a', 8)),
+			'b8': new Knight("b", new Position('b', 8)),
+			'c8': new Bishop("b", new Position('c', 8)),
+			'd8': new Queen( "b", new Position('d', 8)),
+			'e8': new King(  "b", new Position('e', 8)),
+			'f8': new Bishop("b", new Position('f', 8)),
+			'g8': new Knight("b", new Position('g', 8)),
+			'h8': new Rook(  "b", new Position('h', 8)),
+		}
+		// pawns
 		var files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 		files.forEach(file => {
 			this.board[file + 2] = new Pawn("w", new Position(file, 2))
-		})
-		files.forEach(file => {
 			this.board[file + 7] = new Pawn("b", new Position(file, 7))
 		})
-		this.board['a' + 1] = new Rook("w",   new Position('a', 1))
-		this.board['h' + 1] = new Rook("w",   new Position('h', 1))
-		this.board['b' + 1] = new Knight("w", new Position('b', 1))
-		this.board['g' + 1] = new Knight("w", new Position('g', 1))
-		this.board['c' + 1] = new Bishop("w", new Position('c', 1))
-		this.board['f' + 1] = new Bishop("w", new Position('f', 1))
-		this.board['d' + 1] = new Queen("w",  new Position('d', 1))
-		this.board['e' + 1] = new King("w",   new Position('e', 1))
-		this.board['a' + 8] = new Rook("b",   new Position('a', 8))
-		this.board['h' + 8] = new Rook("b",   new Position('h', 8))
-		this.board['b' + 8] = new Knight("b", new Position('b', 8))
-		this.board['g' + 8] = new Knight("b", new Position('g', 8))
-		this.board['c' + 8] = new Bishop("b", new Position('c', 8))
-		this.board['f' + 8] = new Bishop("b", new Position('f', 8))
-		this.board['d' + 8] = new Queen("b",  new Position('d', 8))
-		this.board['e' + 8] = new King("b",   new Position('e', 8))
 	}
 
 	controlledSquares(color) {
