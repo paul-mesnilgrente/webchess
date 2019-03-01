@@ -155,9 +155,9 @@ class Piece {
 		this.hasMoved = true
 	}
 
-	get name() {
-		return this.constructor.name.toLowerCase()
-	}
+	get name() { return this.constructor.name.toLowerCase() }
+	get rank() { return this.position.rank }
+	get file() { return this.position.file }
 }
 
 class Pawn extends Piece {
@@ -185,6 +185,9 @@ class Pawn extends Piece {
 		if (!board.squareEmpty(p) && board.available(p, this.color))
 			moves.push(new Move(this, p))
 
+		// prise en passant
+		// ...
+
 		return moves
 	}
 }
@@ -204,7 +207,7 @@ function bishopRookMoves(board, piece, directions) {
 
 class Rook extends Piece {
 	availableMoves(board) {
-		// right, left, up, down
+		// [right, left, up, down]
 		var sameChar = c => c
 		var directions = [[nextChar, 0], [prevChar, 0], [sameChar, +1], [sameChar, -1]]
 		return bishopRookMoves(board, this, directions)
@@ -213,7 +216,7 @@ class Rook extends Piece {
 
 class Bishop extends Piece {
 	availableMoves(board) {
-		// all diagonal directions
+		// [right up, right down, left up, left down]
 		var directions = [[nextChar, +1], [nextChar, -1], [prevChar, +1], [prevChar, -1]]
 		return bishopRookMoves(board, this, directions)
 	}
@@ -221,19 +224,16 @@ class Bishop extends Piece {
 
 class Queen extends Piece {
 	availableMoves(board) {
-		var moves = []
-
 		var bishop = new Bishop(this.color, this.position)
 		var rook = new Rook(this.color, this.position)
 
-		moves = moves.concat(bishop.availableMoves(board))
-		moves = moves.concat(rook.availableMoves(board))
-
-		return moves
+		var moves = bishop.availableMoves(board)
+		return moves.concat(rook.availableMoves(board))
 	}
 }
 
 class Knight extends Piece {
+
 	availableMoves(board) {
 		var p = this.position
 		var moves = [
@@ -257,6 +257,29 @@ class Knight extends Piece {
 
 class King extends Piece {
 
+	canRock(board, controlled_squares, rook, square1, square2) {
+		return !this.hasMoved && rook != null && !rook.hasMoved &&
+			   board.squareEmpty(square1) && board.squareEmpty(square2) &&
+			   controlled_squares.find(s => square1.equals(s)) == null &&
+			   controlled_squares.find(s => square2.equals(s)) == null
+	}
+
+	canKingRock(board, controlled_squares) {
+		var rook = board.at(new Position('h', this.rank))
+		var square1 = new Position('g', this.rank)
+		var square2 = new Position('f', this.rank)
+
+		return this.canRock(board, controlled_squares, rook, square1, square2)
+	}
+
+	canQueenRock(board, controlled_squares) {
+		var rook = board.at(new Position('a', this.rank))
+		var square1 = new Position('c', this.rank)
+		var square2 = new Position('d', this.rank)
+
+		return this.canRock(board, controlled_squares, rook, square1, square2)
+	}
+
 	availableMoves(board) {
 		var p = this.position
 		var moves = [
@@ -275,6 +298,13 @@ class King extends Piece {
 		moves = moves.filter(move =>
 			controlled_squares.find(square => square.equals(move.square)) == null
 		)
+		if (this.canKingRock(board, controlled_squares)) {
+			moves.push(new Move(this, new Position('g', this.rank)))
+		}
+		if (this.canQueenRock(board, controlled_squares)) {
+			moves.push(new Move(this, new Position('c', this.rank)))
+		}
+
 		return moves
 	}
 }
