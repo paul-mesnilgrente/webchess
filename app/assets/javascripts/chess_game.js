@@ -151,6 +151,10 @@ class Piece {
 		this.position = position
 		this.hasMoved = true
 	}
+
+	get name() {
+		return this.constructor.name.toLowerCase()
+	}
 }
 
 class Pawn extends Piece {

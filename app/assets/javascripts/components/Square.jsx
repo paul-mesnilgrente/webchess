@@ -9,12 +9,9 @@ class Square extends React.Component {
 	}
 
 	renderPiece() {
-		onClick = this.props.onPieceClick
 		piece = this.props.piece
 		if (piece != null) {
-			var imgFile = ""
-			var pieceName = piece.constructor.name.toLowerCase()
-			imgFile = `/images/pieces/${piece.color}_${pieceName}.svg`
+			var imgFile = `/images/pieces/${piece.color}_${piece.name}.svg`
 			return  <PieceImg
 								imgFile={imgFile}
 								color={piece.color}
