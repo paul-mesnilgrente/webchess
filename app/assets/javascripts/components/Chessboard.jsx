@@ -61,7 +61,7 @@ class Chessboard extends React.Component {
 			piece = this.state.game.board.at(piece.position)
 			this.setState({
 				selectedPiece: piece,
-				controlled: piece.available_moves(this.state.game.board)
+				controlled: piece.availableMoves(this.state.game.board)
 			})
 		} else {
 			this.setState({
@@ -91,7 +91,7 @@ class Chessboard extends React.Component {
 	renderSquare(file, rank) {
 		var position = new Position(file, rank)
 		controlled = false
-		for (var i = 0; i < this.state.controlled.length && !controlled; i++) {
+		for (let i = 0; i < this.state.controlled.length && !controlled; i++) {
 			move = this.state.controlled[i]
 			if (move.square.equals(position))
 				controlled = true
@@ -115,7 +115,7 @@ class Chessboard extends React.Component {
 	renderRank(rank) {
 		let squares = []
 		let files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-		for (var i = 0; i <= 7; i++) {
+		for (let i = 0; i <= 7; i++) {
 			squares.push(this.renderSquare(files[i], rank))
 		}
 		return (
@@ -127,7 +127,7 @@ class Chessboard extends React.Component {
 
 	render() {
 		let ranks = []
-		for (var rank_number = 8; rank_number >= 1; rank_number--) {
+		for (let rank_number = 8; rank_number >= 1; rank_number--) {
 			ranks.push(this.renderRank(rank_number))
 		}
 		return (

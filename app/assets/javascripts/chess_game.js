@@ -14,13 +14,8 @@ class ChessGame {
 		if (piece == null) {
 			throw new Error("No piece in " + square_start.toString())
 		}
-		var moves = piece.available_moves(this.board)
-		for (var i = 0; i < moves.length; i++) {
-			if (moves[i].square.equals(square_end))
-				return true
-		}
-
-		return false
+		var moves = piece.availableMoves(this.board)
+		return moves.find(move => move.square.equals(square_end)) != null
 	}
 }
 
@@ -52,22 +47,34 @@ class Board {
 		this.board['e' + 8] = new King("b",   new Position('e', 8))
 	}
 
-	build_controlled_squares_list(color) {
-		var controlled_squares = []
+	controlledSquares(color) {
+		var squares = []
 		for (var key in this.board) {
-			if (this.board[key] != color) {
+			if (this.board[key].color != color) {
 				if (this.board[key].constructor.name != "King") {
-					var moves = this.board[key].available_moves(this)
-					for (var move in moves) {
-						// to test
-						if (! move.square in controlled_squares) {
-							controlled_squares.push(move.square)
-						}
-					}
+					var moves = this.board[key].availableMoves(this)
+					squares = squares.concat(moves.map(move => move.square))
+				} else {
+					var p = this.board[key].position
+					var positions = [
+						new Position(p.file, p.rank + 1),
+						new Position(p.file, p.rank - 1),
+						new Position(nextChar(p.file), p.rank),
+						new Position(prevChar(p.file), p.rank),
+						new Position(nextChar(p.file), p.rank + 1),
+						new Position(nextChar(p.file), p.rank - 1),
+						new Position(prevChar(p.file), p.rank + 1),
+						new Position(prevChar(p.file), p.rank - 1)
+					]
+					squares = squares.concat(positions.filter(p => this.in(p)))
 				}
 			}
 		}
-		return controlled_squares
+		// remove duplicates
+		squares = squares.filter((square, index, self) =>
+			index == self.findIndex(s => square.equals(s))
+		)
+		return squares
 	}
 
 	in(p) {
@@ -83,6 +90,19 @@ class Board {
 
 	at(position) {
 		return this.board[position.toString()]
+	}
+
+	squareEmpty(position) {
+		return this.board[position.toString()] == null
+	}
+
+	sameColor(position, color) {
+		return this.at(position).color == color
+	}
+
+	available(to, color) {
+		return this.in(to) &&
+			   (this.squareEmpty(to) || !this.sameColor(to, color))
 	}
 }
 
@@ -134,150 +154,95 @@ class Piece {
 }
 
 class Pawn extends Piece {
-	available_moves(board) {
+	availableMoves(board) {
 		var moves = []
 		var additionner = this.color == "w" ? +1 : -1
 
 		// move forward of 1
-		var p1 = new Position(this.position.file, this.position.rank + additionner)
-		if (board.in(p1) && board.at(p1) == null)
-			moves.push(new Move(this, p1))
-
-		// move forward of 2
-		var p = new Position(this.position.file, this.position.rank + 2 * additionner)
-		if (board.in(p) && board.at(p1) == null && board.at(p) == null && !this.hasMoved)
+		var p = new Position(this.position.file, this.position.rank + additionner)
+		if (board.in(p) && board.squareEmpty(p, this.color)) {
 			moves.push(new Move(this, p))
+			p = new Position(this.position.file, this.position.rank + 2 * additionner)
+			// move forward of 2
+			if (board.in(p) && board.squareEmpty(p, this.color))
+				moves.push(new Move(this, p))
+		}
 		
 		// eats in diagonal
 		p = new Position(nextChar(this.position.file), this.position.rank + additionner)
-		if (board.in(p) && board.at(p) != null && board.at(p).color != this.color)
+		if (!board.squareEmpty(p) && board.available(p, this.color))
 			moves.push(new Move(this, p))
 
 		// eats in diagonal
 		p = new Position(prevChar(this.position.file), this.position.rank + additionner)
-		if (board.in(p) && board.at(p) != null && board.at(p).color != this.color)
+		if (!board.squareEmpty(p) && board.available(p, this.color))
 			moves.push(new Move(this, p))
 
 		return moves
 	}
 }
 
+function bishopRookMoves(board, piece, directions) {
+	var moves = []
+	directions.forEach(([nextFile, rank_add]) => {
+		var p = new Position(nextFile(piece.position.file), piece.position.rank + rank_add)
+		while (board.available(p, piece.color)) {
+			moves.push(new Move(piece, p))
+			if (!board.squareEmpty(p)) break;
+			p = new Position(nextFile(p.file), p.rank + rank_add)
+		}
+	})
+	return moves
+}
+
 class Rook extends Piece {
-	available_moves(board) {
+	availableMoves(board) {
+		// right, left, up, down
+		var sameChar = c => c
+		var directions = [[nextChar, 0], [prevChar, 0], [sameChar, +1], [sameChar, -1]]
+		return bishopRookMoves(board, this, directions)
+	}
+}
+
+class Bishop extends Piece {
+	availableMoves(board) {
+		// all diagonal directions
+		var directions = [[nextChar, +1], [nextChar, -1], [prevChar, +1], [prevChar, -1]]
+		return bishopRookMoves(board, this, directions)
+	}
+}
+
+class Queen extends Piece {
+	availableMoves(board) {
 		var moves = []
-		// forward and backward direction
-		var directions = [-1, 1]
-		directions.forEach(additionner => {
-			var p = new Position(this.position.file, this.position.rank + additionner)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(p.file, p.rank + additionner)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
-		// right and left direction
-		directions = [nextChar, prevChar]
-		directions.forEach(next => {
-			var p = new Position(next(this.position.file), this.position.rank)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(next(p.file), p.rank)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
+
+		var bishop = new Bishop(this.color, this.position)
+		var rook = new Rook(this.color, this.position)
+
+		moves = moves.concat(bishop.availableMoves(board))
+		moves = moves.concat(rook.availableMoves(board))
+
 		return moves
 	}
 }
 
 class Knight extends Piece {
-	available_moves(board) {
-		var moves = []
+	availableMoves(board) {
 		var p = this.position
-		var positions = [
-			new Position(prevChar(p.file), p.rank + 2),
-			new Position(nextChar(p.file), p.rank + 2),
-			new Position(prevChar(p.file), p.rank - 2),
-			new Position(nextChar(p.file), p.rank - 2),
-			new Position(prevChar(prevChar(p.file)), p.rank + 1),
-			new Position(prevChar(prevChar(p.file)), p.rank - 1),
-			new Position(nextChar(nextChar(p.file)), p.rank + 1),
-			new Position(nextChar(nextChar(p.file)), p.rank - 1)
+		var moves = [
+			new Move(this, new Position(prevChar(p.file), p.rank + 2)),
+			new Move(this, new Position(nextChar(p.file), p.rank + 2)),
+			new Move(this, new Position(prevChar(p.file), p.rank - 2)),
+			new Move(this, new Position(nextChar(p.file), p.rank - 2)),
+			new Move(this, new Position(prevChar(prevChar(p.file)), p.rank + 1)),
+			new Move(this, new Position(prevChar(prevChar(p.file)), p.rank - 1)),
+			new Move(this, new Position(nextChar(nextChar(p.file)), p.rank + 1)),
+			new Move(this, new Position(nextChar(nextChar(p.file)), p.rank - 1))
 		]
 
-		positions.forEach(position => {
-			if (board.in(position))
-				if (board.at(position) == null || board.at(p).color != this.color)
-					moves.push(new Move(this, position))
-
-		})
-
-		return moves
-	}
-}
-
-class Bishop extends Piece {
-	available_moves(board) {
-		var moves = []
-		// all diagonal directions
-		var directions = [[nextChar, +1], [nextChar, -1], [prevChar, +1], [prevChar, -1]]
-		directions.forEach(([nextFile, rank_add]) => {
-			var p = new Position(nextFile(this.position.file), this.position.rank + rank_add)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(nextFile(p.file), p.rank + rank_add)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
-		return moves
-	}
-}
-
-class Queen extends Piece {
-	available_moves(board) {
-		var moves = []
-		// all diagonal directions
-		var directions = [[nextChar, +1], [nextChar, -1], [prevChar, +1], [prevChar, -1]]
-		directions.forEach(([nextFile, rank_add]) => {
-			var p = new Position(nextFile(this.position.file), this.position.rank + rank_add)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(nextFile(p.file), p.rank + rank_add)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
-
-		// forward and backward direction
-		directions = [-1, +1]
-		directions.forEach(additionner => {
-			var p = new Position(this.position.file, this.position.rank + additionner)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(p.file, p.rank + additionner)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
-		// right and left direction
-		directions = [nextChar, prevChar]
-		directions.forEach(next => {
-			var p = new Position(next(this.position.file), this.position.rank)
-			while (board.at(p) == null && board.in(p)) {
-				moves.push(new Move(this, p))
-				p = new Position(next(p.file), p.rank)
-			}
-			if (board.at(p) != null && board.at(p).color != this.color) {
-				moves.push(new Move(this, p))
-			}
-		})
+		moves = moves.filter(move => 
+			board.available(move.square, this.color)
+		)
 
 		return moves
 	}
@@ -285,35 +250,24 @@ class Queen extends Piece {
 
 class King extends Piece {
 
-	available_moves(board) {
-		var moves = []
+	availableMoves(board) {
 		var p = this.position
-		var positions = [
-			new Position(p.file, p.rank + 1),
-			new Position(p.file, p.rank - 1),
-			new Position(nextChar(p.file), p.rank),
-			new Position(prevChar(p.file), p.rank),
-			new Position(nextChar(p.file), p.rank + 1),
-			new Position(nextChar(p.file), p.rank - 1),
-			new Position(prevChar(p.file), p.rank + 1),
-			new Position(prevChar(p.file), p.rank - 1)
+		var moves = [
+			new Move(this, new Position(p.file, p.rank + 1)),
+			new Move(this, new Position(p.file, p.rank - 1)),
+			new Move(this, new Position(nextChar(p.file), p.rank)),
+			new Move(this, new Position(prevChar(p.file), p.rank)),
+			new Move(this, new Position(nextChar(p.file), p.rank + 1)),
+			new Move(this, new Position(nextChar(p.file), p.rank - 1)),
+			new Move(this, new Position(prevChar(p.file), p.rank + 1)),
+			new Move(this, new Position(prevChar(p.file), p.rank - 1))
 		]
-		var controlled_squares = board.build_controlled_squares_list(this.color)
-		positions.forEach((position, index, object) => {
-			console.log('available_moves')
-			var removed = false
-			for (var i = 0; i < controlled_squares.length && !removed; i++) {
-				console.log('in:', board.in(position))
-				console.log('new_square:', position)
-				console.log('controlled_square:', controlled_squares[i].square)
-				if (!board.in(position) || position.equals(controlled_squares[i].square)) {
-					console.log('')
-					object.splice(index, 1)
-					removed = true
-				}
-			}
-		})
-
+		var controlled_squares = board.controlledSquares(this.color)
+		// remove basic forgiven moves
+		moves = moves.filter(move => board.available(move.square, this.color))
+		moves = moves.filter(move =>
+			controlled_squares.find(square => square.equals(move.square)) == null
+		)
 		return moves
 	}
 }
