@@ -18,10 +18,14 @@ class GameController < ApplicationController
       'h' => ['wr', 'wp', nil, nil, nil, nil, 'bp', 'br'],
     }
     @game.moves.sort_by {|move| move.number}
-    @game.moves.each() do |move|
-      @board = move_piece(@board, move)
+    @game.moves.each {|move| @board = move_piece(@board, move) }
+    if @current_user == @game.white_player
+      @player =  "w"
+      @opponent = @game.black_player
+    else
+      @player =  "b"
+      @opponent = @game.white_player
     end
-    @player = @current_user == @game.white_player ? "w" : "b"
   end
 
   private

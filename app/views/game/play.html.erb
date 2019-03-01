@@ -10,14 +10,7 @@
       }) %>
     </div>
     <div class="col">
-      <p>
-        Opponent: 
-        <% if @user == @game.black_player %>
-          <%= @game.white_player.username %>
-        <% else %>
-          <%= @game.black_player.username %>
-        <% end %>
-      </p>
+      <p>Opponent: <%= @opponent.username %></p>
     </div>
   </div>
 </div>
