@@ -13,18 +13,8 @@ class Square extends React.Component {
 		piece = this.props.piece
 		if (piece != null) {
 			var imgFile = ""
-			if (piece.constructor.name == 'Pawn')
-				imgFile = `/images/pieces/${piece.color}_pawn.svg`
-			else if (piece.constructor.name == 'Rook')
-				imgFile = `/images/pieces/${piece.color}_rook.svg`
-			else if (piece.constructor.name == 'Knight')
-				imgFile = `/images/pieces/${piece.color}_knight.svg`
-			else if (piece.constructor.name == 'Bishop')
-				imgFile = `/images/pieces/${piece.color}_bishop.svg`
-			else if (piece.constructor.name == 'Queen')
-				imgFile = `/images/pieces/${piece.color}_queen.svg`
-			else if (piece.constructor.name == 'King')
-				imgFile = `/images/pieces/${piece.color}_king.svg`
+			var pieceName = piece.constructor.name.toLowerCase()
+			imgFile = `/images/pieces/${piece.color}_${pieceName}.svg`
 			return  <PieceImg
 								imgFile={imgFile}
 								color={piece.color}

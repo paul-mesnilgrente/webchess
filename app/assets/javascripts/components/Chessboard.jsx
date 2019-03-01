@@ -56,7 +56,6 @@ class Chessboard extends React.Component {
 	}
 
 	toggleSelectPiece(piece) {
-
 		if (this.state.selectedPiece == null) {
 			piece = this.state.game.board.at(piece.position)
 			this.setState({
@@ -90,16 +89,10 @@ class Chessboard extends React.Component {
 
 	renderSquare(file, rank) {
 		var position = new Position(file, rank)
-		controlled = false
-		for (let i = 0; i < this.state.controlled.length && !controlled; i++) {
-			move = this.state.controlled[i]
-			if (move.square.equals(position))
-				controlled = true
-		}
-		var selected = false
-		if (this.state.selectedPiece != null && this.state.selectedPiece.position.equals(position)) {
-			selected = true
-		}
+		controlled = this.state.controlled.find(m => m.square.equals(position)) != null
+		var selected = this.state.selectedPiece != null &&
+						       this.state.selectedPiece.position.equals(position)
+
 		return (
 			<Square
 				key={file + rank}
@@ -113,27 +106,22 @@ class Chessboard extends React.Component {
 	}
 
 	renderRank(rank) {
-		let squares = []
-		let files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-		for (let i = 0; i <= 7; i++) {
-			squares.push(this.renderSquare(files[i], rank))
-		}
+		var files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+		if (this.props.player == "b") files = files.reverse()
 		return (
 			<div key={rank} className="rank">
-				{squares}
+				{files.map(file => this.renderSquare(file, rank))}
 			</div>
 		)
 	}
 
 	render() {
-		let ranks = []
-		for (let rank_number = 8; rank_number >= 1; rank_number--) {
-			ranks.push(this.renderRank(rank_number))
-		}
+		var ranks = [8, 7, 6, 5, 4, 3, 2, 1]
+		if (this.props.player == "b") ranks = ranks.reverse()
 		return (
 			<ErrorBoundary>
 				<div className="chessboard">
-					{ranks}
+					{ranks.map(rank => this.renderRank(rank))}
 				</div>
 			</ErrorBoundary>
 		)
