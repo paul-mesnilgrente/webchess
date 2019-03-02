@@ -1,21 +1,22 @@
 class ChessGame {
 	constructor(moves) {
 		this.board = new Board()
-		this.moves = moves
+		this.moves = []
 		moves.forEach(move => {
 			var p1 = new Position(move.notation[0], move.notation[1])
 			var p2 = new Position(move.notation[2], move.notation[3])
-			this.board.move(p1, p2)
+			var m = new Move(this.board.at(p1), p2)
+			this.board.move(m)
+			this.moves.push(m)
 		})
 	}
 
-	moveValid(square_start, square_end) {
-		var piece = this.board.at(square_start)
-		if (piece == null) {
-			throw new Error("No piece in " + square_start.toString())
+	moveValid(move) {
+		if (move.piece == null) {
+			throw new Error("No piece in " + move.piece.position.toString())
 		}
-		var moves = piece.availableMoves(this.board)
-		return moves.find(move => move.square.equals(square_end)) != null
+		var moves = move.piece.availableMoves(this.board)
+		return moves.find(m => move.square.equals(m.square)) != null
 	}
 }
 
@@ -50,6 +51,12 @@ class Board {
 		})
 	}
 
+	move(move) {
+		this.board[move.square.toString()] = move.piece
+		delete this.board[move.piece.position.toString()]
+		move.piece.move(move.square)
+	}
+
 	controlledSquares(color) {
 		var squares = []
 		for (var key in this.board) {
@@ -82,13 +89,6 @@ class Board {
 
 	in(p) {
 		return p.file >= 'a' && p.file <= 'h' && p.rank >= 1 && p.rank <= 8
-	}
-
-	move(square_start, square_end) {
-		var piece = this.at(square_start)
-		this.board[square_end.toString()] = piece
-		piece.move(square_end)
-		delete this.board[square_start.toString()]
 	}
 
 	at(position) {
@@ -138,7 +138,7 @@ class Position {
 
 class Move {
 	constructor(piece, square) {
-		this.piece = square
+		this.piece = piece
 		this.square = square
 	}
 }
@@ -171,7 +171,7 @@ class Pawn extends Piece {
 			moves.push(new Move(this, p))
 			p = new Position(this.position.file, this.position.rank + 2 * additionner)
 			// move forward of 2
-			if (board.in(p) && board.squareEmpty(p, this.color))
+			if (!this.hasMoved && board.in(p) && board.squareEmpty(p, this.color))
 				moves.push(new Move(this, p))
 		}
 		

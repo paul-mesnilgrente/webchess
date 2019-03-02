@@ -1,7 +1,6 @@
 .chessboard {
 	height: 512px;
 	width: 512px;
-	// border: 1px solid black;
 	padding: 0;
 	font-size: 0;
 
@@ -9,8 +8,21 @@
 		height: 12.5%;
 	}
 
-	.controlled {
-		background: yellow;
+	.square-b-controlled {
+		background: radial-gradient(
+			rgba(20,85,30,0.3) 17%,
+			#208530 0,
+			rgba(0,0,0,0.3) 0,
+			#b58863 0
+		);
+	}
+	.square-w-controlled {
+		background: radial-gradient(
+			rgba(20,85,30,0.3) 17%,
+			#208530 0,
+			rgba(0,0,0,0.3) 0,
+			#f0d9b5 0
+		);
 	}
 
 	.square {

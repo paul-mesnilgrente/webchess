@@ -26,10 +26,12 @@ class Chessboard extends React.Component {
 					console.log(`Disconnected from "game-${this.props.id}"`)
 				},
 				'received': data => {
+					game = this.state.game
 					var square_start = new Position(data.message[0], parseInt(data.message[1]))
 					var square_end = new Position(data.message[2], parseInt(data.message[3]))
-					if (this.state.game.moveValid(square_start, square_end)) {
-						this.state.game.board.move(square_start, square_end)
+					var move = new Move(game.board.at(square_start), square_end)
+					if (game.moveValid(move)) {
+						game.board.move(move)
 						this.setState({
 							controlled: [],
 							selectedPiece: null
@@ -45,7 +47,8 @@ class Chessboard extends React.Component {
 	}
 
 	send(square_start, square_end) {
-		if (this.state.game.moveValid(square_start, square_end)) {
+		var move = new Move(this.game.board.at(square_start), square_end)
+		if (this.state.game.moveValid(move)) {
 			this.state.channel.speak(`${square_start.toString()}${square_end.toString()}`)
 		} else {
 			this.setState({

@@ -25,7 +25,7 @@ class Square extends React.Component {
 	
 	render() {
 		className = `square square-${this.props.position.color()}`
-		className += this.props.controlled ? "controlled" : ""
+		className += this.props.controlled ? "-controlled" : ""
 		return (
 			<div className={className} onClick={this.onSquareClick}>
 				{this.renderPiece()}
