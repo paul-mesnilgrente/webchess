@@ -29,10 +29,10 @@ class UserController < ApplicationController
   def search
     respond_to do |format|
       if params[:username].present?
-        users = User.search(params[:username]).where("id != ?", @user.id)
+        users = User.search(params[:username]).where("id != ?", @current_user.id)
         format.json { render({:json => users})}
       else
-        format.json { render({:json => 'username should be included'})}
+        format.json { render({:json => {:error => 'username should be included'}})}
       end
     end
   end
