@@ -12,7 +12,7 @@
 
   <%= form_for(@challenge, :method => 'delete') do |f| %>
 
-    <% if @user == @challenge.challenger %>
+    <% if @current_user == @challenge.challenger %>
       <p>
         Are you sure you want to cancel the challenge sent to <%= @challenge.challenged.username %>?
       </p>
@@ -23,7 +23,7 @@
     <% end %>
 
     <div class="form-buttons">
-    <% if @user == @challenge.challenger %>
+    <% if @current_user == @challenge.challenger %>
       <%= f.submit("Cancel challenge", {:class => "btn btn-danger"}) %>
     <% else %>
       <%= f.submit("Reject challenge", {:class => "btn btn-danger"}) %>

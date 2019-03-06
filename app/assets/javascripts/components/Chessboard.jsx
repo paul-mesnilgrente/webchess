@@ -47,7 +47,7 @@ class Chessboard extends React.Component {
 	}
 
 	send(square_start, square_end) {
-		var move = new Move(this.game.board.at(square_start), square_end)
+		var move = new Move(this.state.game.board.at(square_start), square_end)
 		if (this.state.game.moveValid(move)) {
 			this.state.channel.speak(`${square_start.toString()}${square_end.toString()}`)
 		} else {
