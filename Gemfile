@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -18,7 +20,8 @@ gem 'uglifier', '>= 1.3.0'
 
 # Use Haml for view files
 gem 'haml-rails', '~> 2.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+# Turbolinks makes navigating your web application faster. Read more:
+# https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
@@ -36,24 +39,36 @@ gem 'bcrypt', '~> 3.1.7'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 
-# *** custom gems ***
+# use bootstrap for the CSS framework
 gem 'bootstrap', '~> 4.3.1'
 gem 'jquery-rails', '~> 4.3'
+
+# react is used for the chess interactions
 gem 'react-rails', '~> 2.4'
+
+group :uat, :staging, :production do
+  # parsable logs
+  gem 'lograge', '~> 0.11.2'
+end
 
 group :development, :test do
   gem 'pry-byebug', '~> 3.7'
   gem 'pry-rails', '~> 0.3.9'
+  gem 'rubocop', '~> 0.70'
+  gem 'rubocop-performance', '~> 1.5'
+  gem 'rubocop-rails', '~> 2.3'
 end
 
 group :development do
   # Get a more informative error page in development
-  gem 'better_errors'
-  gem 'binding_of_caller'
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
+  gem 'better_errors', '~> 2.5'
+  gem 'binding_of_caller', '~> 0.8.0'
+  # Access an interactive console on exception pages or by calling 'console'
+  # anywhere in the code.
   gem 'listen', '>= 3.0.5', '< 3.2'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'web-console', '>= 3.3.0'
+  # Spring speeds up development by keeping your application running in the
+  # background. Read more: https://github.com/rails/spring
   gem 'spring', '~> 2.1'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end

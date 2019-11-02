@@ -1,12 +1,11 @@
+# frozen_string_literal: true
+
 class PublicController < ApplicationController
-
   skip_before_action :ensure_authenticated_user
-  
-  def index
-  end
 
-  def contact
-  end
+  def index; end
+
+  def contact; end
 
   def sandbox
     @board = {
@@ -17,7 +16,7 @@ class PublicController < ApplicationController
       'e' => ['wk', 'wp', nil, nil, nil, nil, 'bp', 'bk'],
       'f' => ['wb', 'wp', nil, nil, nil, nil, 'bp', 'bb'],
       'g' => ['wn', 'wp', nil, nil, nil, nil, 'bp', 'bn'],
-      'h' => ['wr', 'wp', nil, nil, nil, nil, 'bp', 'br'],
+      'h' => ['wr', 'wp', nil, nil, nil, nil, 'bp', 'br']
     }
   end
 end

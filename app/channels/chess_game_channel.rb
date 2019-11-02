@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChessGameChannel < ApplicationCable::Channel
   def subscribed
     @game = Game.find(params[:room].split('-')[1])
@@ -13,14 +15,12 @@ class ChessGameChannel < ApplicationCable::Channel
     move.game = @game
     move.number = @game.moves.length + 1
     move.notation = data['message']
-    if move.save
-      ActionCable.server.broadcast(room, {:message => move.notation})
-    end
+    ActionCable.server.broadcast(room, message: move.notation) if move.save
   end
 
   private
-    def room
-      return "game-#{@game.id}"
-    end
 
+  def room
+    "game-#{@game.id}"
+  end
 end

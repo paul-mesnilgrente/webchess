@@ -1,31 +1,27 @@
-class ChallengeController < ApplicationController
+# frozen_string_literal: true
 
+class ChallengeController < ApplicationController
   def index
-    @challenges_received = Challenge.where("challenged_id = ?", @current_user.id)
-    @challenges_sent = Challenge.where("challenger_id = ?", @current_user.id)
+    @challenges_received = Challenge.where(challenged: @current_user)
+    @challenges_sent = Challenge.where(challenger: @current_user.id)
   end
 
   def new
     challenger = @current_user
     if params[:challenged].present?
       challenged = User.find(params[:challenged])
-      challenge = Challenge.new
-      challenge.challenger = challenger
-      challenge.challenged = challenged
-      if ! challenge.save
-        flash[:notice] = 'Error, the challenge could not be saved'
-      end
+      c = Challenge.new(challenger, challenged)
+
+      flash[:notice] = 'Error, the challenge could not be saved' unless c.save
     else
       flash[:notice] = "Error you haven't provide the id of the challenged"
     end
     redirect_to(challenge_index_path)
   end
 
-  def show
-  end
+  def show; end
 
-  def edit
-  end
+  def edit; end
 
   def delete
     @challenge = Challenge.find(params[:id])
@@ -34,25 +30,24 @@ class ChallengeController < ApplicationController
   def destroy
     @challenge = Challenge.find(params[:id])
     @challenge.destroy
-    if @challenge.challenger == @current_user
-      flash[:notice] = "Challenge with '#{@challenge.challenged.username}' successfully cancelled."
-    else
-      flash[:notice] = "Challenge with '#{@challenge.challenged.username}' successfully rejected."
-    end
+
     redirect_to(challenge_index_path)
   end
 
   def accept
     @challenge = Challenge.find(params[:id])
-    if rand(2)
-      black_player = @challenge.challenged
-      white_player = @challenge.challenger
-    else
-      black_player = @challenge.challenger
-      white_player = @challenge.challenged
-    end
-    @game = Game.create(:white_player_id => black_player.id, :black_player_id => white_player.id)
+    black, white = pick_colors
+    @game = Game.create(white_player: white, black_player: black)
+
     @challenge.destroy
-    redirect_to(play_game_path(:id => @game.id))
+    redirect_to(play_game_path(id: @game.id))
+  end
+
+  def pick_colors
+    if rand(2)
+      [@challenge.challenged, @challenge.challenger]
+    else
+      [@challenge.challenger, @challenge.challenged]
+    end
   end
 end
