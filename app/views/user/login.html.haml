@@ -1,0 +1,21 @@
+- @page_title = "Login"
+.row.justify-content-center
+  .col-6.offset-4
+  = form_tag(user_attempt_login_path, :method => :post) do
+    %form
+      .form-group
+        = label_tag :email
+        = text_field_tag(:email, params[:email], {:class => 'form-control', :placeholder => "Enter email", 'aria-describedby' => "emailHelp"})
+        / <label for="exampleInputEmail1">Email address</label>
+        / <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        %small#emailHelp.form-text.text-muted We'll never share your email with anyone else.
+      .form-group
+        = label_tag(:password)
+        = password_field_tag(:password, nil, {:class => 'form-control', :placeholder => 'Password'})
+        /
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+      .form-group.form-check
+        %input#exampleCheck1.form-check-input{:type => "checkbox"}/
+        %label.form-check-label{:for => "exampleCheck1"} Check me out
+      = submit_tag("Log In", {'class' => 'btn btn-primary'})

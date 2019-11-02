@@ -1,0 +1,19 @@
+- if @user == @challenge.challenger
+  - @page_title = "Cancel challenge"
+- else
+  - @page_title = "Reject challenge"
+= link_to("<< Back to challenges", challenge_index_path, :class => 'btn btn-primary')
+.subjects.delete
+  %h2 Reject challenge
+  = form_for(@challenge, :method => 'delete') do |f|
+    - if @current_user == @challenge.challenger
+      %p
+        Are you sure you want to cancel the challenge sent to #{@challenge.challenged.username}?
+    - else
+      %p
+        Are you sure you want to reject the challenge sent from #{@challenge.challenger.username}?
+    .form-buttons
+      - if @current_user == @challenge.challenger
+        = f.submit("Cancel challenge", {:class => "btn btn-danger"})
+      - else
+        = f.submit("Reject challenge", {:class => "btn btn-danger"})

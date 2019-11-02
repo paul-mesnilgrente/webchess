@@ -1,0 +1,40 @@
+%h1 Challenges
+%h2 Challenges received
+- if @challenges_received.blank?
+  %p No challenges received at this moment.
+- else
+  %table.table
+    %thead
+      %tr
+        %th{:scope => "col"} #
+        %th{:scope => "col"} Username
+        %th{:scope => "col"} Sent at
+        %th{:scope => "col"} Actions
+    %tbody
+      - @challenges_received.each_with_index do |challenge, index|
+        %tr
+          %th{:scope => "row"}= index + 1
+          %td= challenge.challenger.username
+          %td= challenge.created_at
+          %td
+            = link_to "Accept", accept_challenge_path(challenge), :class => 'btn btn-primary'
+            = link_to "Reject", delete_challenge_path(challenge), :class => "btn btn-danger", :class => 'btn btn-danger'
+%h2 Challenges sent
+- if @challenges_sent.blank?
+  %p You haven't sent any challenge.
+- else
+  %table.table
+    %thead
+      %tr
+        %th{:scope => "col"} #
+        %th{:scope => "col"} Username
+        %th{:scope => "col"} Sent at
+        %th{:scope => "col"} Actions
+    %tbody
+      - @challenges_sent.each_with_index do |challenge, index|
+        %tr
+          %th{:scope => "row"}= index + 1
+          %td= challenge.challenged.username
+          %td= challenge.created_at
+          %td= link_to "Cancel", delete_challenge_path(challenge), :class => "btn btn-danger"
+= react_component("SearchUser")

@@ -1,0 +1,12 @@
+- @page_title = "Play game"
+.container
+  .row
+    .col
+      = react_component("Chessboard", { |
+          'id': @game.id,               |
+          'player': @player,            |
+          'moves': @game.moves          |
+        })                              |
+    .col
+      %p
+        Opponent: #{@opponent.username}
